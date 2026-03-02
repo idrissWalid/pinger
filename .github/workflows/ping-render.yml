@@ -1,0 +1,38 @@
+name: Réveil du serveur Render
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 9h00
+    - cron: '9 9 * * *'   # 9h09
+  workflow_dispatch:
+
+jobs:
+  ping-900:
+    if: github.event.schedule == '0 9 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Ping 9h00
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python pinger.py
+        env:
+          RENDER_URL: ${{ secrets.RENDER_URL }}
+      - run: echo "✅ Ping 9h00 terminé" >> $GITHUB_STEP_SUMMARY
+
+  ping-909:
+    if: github.event.schedule == '9 9 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    name: Ping 9h09
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python pinger.py
+        env:
+          RENDER_URL: ${{ secrets.RENDER_URL }}
+      - run: echo "✅ Ping 9h09 terminé" >> $GITHUB_STEP_SUMMARY
