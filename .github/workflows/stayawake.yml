@@ -1,0 +1,35 @@
+name: Keep Server Awake with Health Check
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-and-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping server
+        id: ping
+        run: |
+          RESPONSE=$(curl -I https://ccnserver.onrender.com \
+            --connect-timeout 10 \
+            --max-time 30 \
+            --silent \
+            --retry 3 \
+            -w "\n%{http_code}" | tail -n1)
+          
+          if [ "$RESPONSE" = "200" ] || [ "$RESPONSE" = "301" ] || [ "$RESPONSE" = "302" ]; then
+            echo "✅ Server responded with status: $RESPONSE"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Server returned unexpected status: $RESPONSE"
+            echo "status=failure" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Send notification on failure (optionnel)
+        if: steps.ping.outputs.status == 'failure'
+        run: |
+          echo "⚠️ Le serveur semble inaccessible !"
+          # Vous pouvez ajouter ici une notification par email, Slack, etc.
