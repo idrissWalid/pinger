@@ -13,7 +13,7 @@ jobs:
       - name: Ping server
         id: ping
         run: |
-          RESPONSE=$(curl -I https://ccnserver.onrender.com \
+          RESPONSE=$(curl -I https://collecteur-de-questions-render.onrender.com \
             --connect-timeout 10 \
             --max-time 30 \
             --silent \
